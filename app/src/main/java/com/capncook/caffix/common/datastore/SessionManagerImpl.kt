@@ -48,4 +48,17 @@ class SessionManagerImpl @Inject constructor(
     }
 
 
+
+
+    override fun saveThemeColors(colors: List<String>) {
+        val colorString = colors.joinToString(",")
+        sharedPrefs.edit { putString("theme_colors", colorString) }
+    }
+
+    override fun getThemeColors(): List<String>? {
+        val colorString = sharedPrefs.getString("theme_colors", null)
+        return colorString?.split(",")
+    }
+
+
 }

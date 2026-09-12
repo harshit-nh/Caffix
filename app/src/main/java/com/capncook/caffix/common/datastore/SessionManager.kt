@@ -7,6 +7,10 @@ interface SessionManager {
     fun saveOnboardingState(isComplete: Boolean)
     fun isOnboardingComplete(): Boolean
     fun clearSession()
+
+
+    fun saveThemeColors(colors: List<String>)
+    fun getThemeColors(): List<String>?
 }
 
 

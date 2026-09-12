@@ -53,9 +53,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.capncook.caffix.R
+import com.capncook.caffix.common.Constants
 import com.capncook.caffix.common.ui_components.skeleton.shimmerEffect
 import com.capncook.caffix.common.ui_components.theme.poppinsFontFamily
+import com.capncook.caffix.common.utils.toComposeColor
 import com.capncook.caffix.feature.home.domain.model.HomeSection
 import com.capncook.caffix.feature.home.domain.model.Product
 import com.capncook.caffix.feature.home.presentation.HomeScreenEvent
@@ -79,13 +82,14 @@ fun HomeScreen(
         derivedStateOf { listState.firstVisibleItemIndex >= 2 }
     }
 
-    val headerGradient = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFF303030),
-            Color(0xFF1F1F1F),
-            Color(0xFF121212)
-        )
-    )
+
+    val gradientColors = if(state.headerGradientColors.isNotEmpty()) {
+        state.headerGradientColors.map { it.toComposeColor() }
+    } else {
+        listOf(Color(0xFF303030), Color(0xFF1F1F1F), Color(0xFF121212))
+    }
+
+    val headerGradient = Brush.verticalGradient(colors = gradientColors)
 
 
     Box(
@@ -168,7 +172,7 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-                        if(state.isLoading && state.feedSections.isEmpty()) {
+                        if(state.isLoading && state.heroBanner == null) {
 
                             //Banner skeleton
                             Box(
@@ -178,16 +182,28 @@ fun HomeScreen(
                                     .shimmerEffect()
                             )
 
-                        }else{
+                        } else{
 
-                            Image(
-                                painter = painterResource(id = R.drawable.banner_1),
-                                contentDescription = "Promo Banner",
-                                contentScale = ContentScale.FillWidth,
-                                modifier = Modifier
-                                    .fillMaxWidth()
+                            state.heroBanner?.let { banner ->
 
-                            )
+                                val imageUrl = "${Constants.BASE_URL}${banner.imageUrl}"
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(160.dp)
+                                        .clip(RoundedCornerShape(16.dp))
+                                ) {
+
+                                    AsyncImage(
+                                        model = imageUrl,
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                            }
+
                         }
 
 

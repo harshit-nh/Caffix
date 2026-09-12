@@ -4,11 +4,14 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color.parseColor
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.graphics.toColorInt
 
 fun Context.openAppNotificationSettings() {
 
@@ -61,6 +64,18 @@ fun Context.hasLocationPermission(): Boolean {
         ) == PackageManager.PERMISSION_GRANTED
 
     return fineLocation && coarseLocation
+}
+
+
+
+fun String.toComposeColor(): Color {
+
+    return try {
+        Color(this.toColorInt())
+    }catch(e: Exception) {
+        Color(0xFF303030)
+    }
+
 }
 
 
