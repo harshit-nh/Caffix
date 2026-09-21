@@ -43,121 +43,121 @@ fun ProductDetailsContent(
     product: Product, innerPadding: PaddingValues
 ) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp)
-            .padding(innerPadding)
-    ) {
-
-        Image(
-            painter = painterResource(product.imageRes),
-            contentDescription = product.name,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop
-
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-
-        Text(text = product.name,
-            fontSize = 20.sp,
-            color = Color.Black,
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Text(text = "Ice / Hot",
-                fontSize = 16.sp,
-                color = Color.Gray,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium
-            )
-
-
-            Icon(
-                painter = painterResource(R.drawable.default_bean),
-                contentDescription = "Bean",
-                modifier = Modifier
-                    .background(
-                        color = IvoryWhite,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .size(36.dp)
-                    .padding(6.dp)
-                , tint = LightBrown
-            )
-        }
-
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        Text(text = "Description",
-            fontSize = 20.sp,
-            color = Color.Black,
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(text = product.description,
-            fontSize = 16.sp,
-            color = Color.Gray,
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-
-        Text(text = "Size",
-            fontSize = 20.sp,
-            color = Color.Black,
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.SemiBold
-        )
-
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        var selectedSizeText by remember { mutableStateOf("M") }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
-        ) {
-
-            listOf("S", "M", "L").forEach { size ->
-
-                SelectSizeChip(
-                    sizeText = size,
-                    selected = selectedSizeText == size,
-                    onClick = { selectedSizeText = size },
-                    Modifier
-                        .weight(1f)
-                        .height(46.dp)
-                )
-            }
-        }
-    }
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.White)
+//            .padding(16.dp)
+//            .padding(innerPadding)
+//    ) {
+//
+//        Image(
+//            painter = painterResource(product.imageRes),
+//            contentDescription = product.name,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(250.dp)
+//                .clip(RoundedCornerShape(16.dp)),
+//            contentScale = ContentScale.Crop
+//
+//        )
+//
+//        Spacer(modifier = Modifier.height(12.dp))
+//
+//
+//        Text(text = product.name,
+//            fontSize = 20.sp,
+//            color = Color.Black,
+//            fontFamily = poppinsFontFamily,
+//            fontWeight = FontWeight.SemiBold
+//        )
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        Row(modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//
+//            Text(text = "Ice / Hot",
+//                fontSize = 16.sp,
+//                color = Color.Gray,
+//                fontFamily = poppinsFontFamily,
+//                fontWeight = FontWeight.Medium
+//            )
+//
+//
+//            Icon(
+//                painter = painterResource(R.drawable.default_bean),
+//                contentDescription = "Bean",
+//                modifier = Modifier
+//                    .background(
+//                        color = IvoryWhite,
+//                        shape = RoundedCornerShape(10.dp)
+//                    )
+//                    .size(36.dp)
+//                    .padding(6.dp)
+//                , tint = LightBrown
+//            )
+//        }
+//
+//
+//        Spacer(modifier = Modifier.height(25.dp))
+//
+//        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+//
+//        Spacer(modifier = Modifier.height(25.dp))
+//
+//        Text(text = "Description",
+//            fontSize = 20.sp,
+//            color = Color.Black,
+//            fontFamily = poppinsFontFamily,
+//            fontWeight = FontWeight.SemiBold
+//        )
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        Text(text = product.description,
+//            fontSize = 16.sp,
+//            color = Color.Gray,
+//            fontFamily = poppinsFontFamily,
+//            fontWeight = FontWeight.Medium,
+//            maxLines = 2,
+//            overflow = TextOverflow.Ellipsis
+//        )
+//
+//        Spacer(modifier = Modifier.height(30.dp))
+//
+//
+//        Text(text = "Size",
+//            fontSize = 20.sp,
+//            color = Color.Black,
+//            fontFamily = poppinsFontFamily,
+//            fontWeight = FontWeight.SemiBold
+//        )
+//
+//
+//        Spacer(modifier = Modifier.height(12.dp))
+//
+//        var selectedSizeText by remember { mutableStateOf("M") }
+//
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.spacedBy(30.dp)
+//        ) {
+//
+//            listOf("S", "M", "L").forEach { size ->
+//
+//                SelectSizeChip(
+//                    sizeText = size,
+//                    selected = selectedSizeText == size,
+//                    onClick = { selectedSizeText = size },
+//                    Modifier
+//                        .weight(1f)
+//                        .height(46.dp)
+//                )
+//            }
+//        }
+//    }
 
 }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,20 +29,29 @@ import androidx.compose.ui.unit.dp
 import com.capncook.caffix.R
 import com.capncook.caffix.common.ui_components.theme.CoffeeBrown
 import com.capncook.caffix.common.ui_components.theme.poppinsFontFamily
+import androidx.core.graphics.toColorInt
 
 
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
+    containerColor: String? = null,
     isDarkTheme: Boolean = true
 ) {
 
     var searchText by remember { mutableStateOf("") }
 
-    val containerColor = if (isDarkTheme) Color(0xFF2A2A2A) else Color(0xFFF5F5F5)
-    val textColor = if (isDarkTheme) Color.White else Color.Black
-    val iconTint = if (isDarkTheme) Color.White else Color.DarkGray
-    val placeholderColor = if (isDarkTheme) Color.Gray else Color.DarkGray
+    val resolvedContainerColor = remember(containerColor) {
+        containerColor?.let { Color(it.toColorInt()) } ?: if (isDarkTheme) Color(0xFF1C1C1C) else Color(0xFFF5F5F5)
+    }
+
+    // Mathematically check if the background we just picked is light or dark
+    // Luminance goes from 0.0 (pure black) to 1.0 (pure white)
+    val isBackgroundLight = resolvedContainerColor.luminance() > 0.5f
+
+    val textColor = if (isBackgroundLight) Color(0xFF121212) else Color.White
+    val iconTint = if (isBackgroundLight) Color.DarkGray else Color.White
+    val placeholderColor = if (isBackgroundLight) Color.Gray else Color.LightGray
 
 
     Row(
@@ -54,7 +64,7 @@ fun SearchBar(
             onValueChange = { searchText = it },
             placeholder = {
                 Text(
-                    "Find your coffees",
+                    "Find your comfort coffees",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Normal,
                     color = placeholderColor
@@ -81,8 +91,8 @@ fun SearchBar(
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                unfocusedContainerColor = containerColor,
-                focusedContainerColor = containerColor, // Keep it consistent when typing
+                unfocusedContainerColor = resolvedContainerColor,
+                focusedContainerColor = resolvedContainerColor, // Keep it consistent when typing
                 cursorColor = CoffeeBrown,
                 focusedTextColor = textColor,
                 unfocusedTextColor = textColor
@@ -90,23 +100,23 @@ fun SearchBar(
 
         )
 
-        Spacer(modifier = Modifier.width(10.dp))
-
-        IconButton(
-            onClick = { },
-            modifier = Modifier
-                .size(width = 50.dp, height = 57.dp)
-                .background(
-                    color = CoffeeBrown,
-                    shape = RoundedCornerShape(15.dp)
-                )
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.regular_outline_filter),
-                contentDescription = "Filter",
-                tint = Color.White,
-                modifier = Modifier.size(28.dp)
-            )
-        }
+//        Spacer(modifier = Modifier.width(10.dp))
+//
+//        IconButton(
+//            onClick = { },
+//            modifier = Modifier
+//                .size(width = 50.dp, height = 57.dp)
+//                .background(
+//                    color = CoffeeBrown,
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//        ) {
+//            Icon(
+//                painter = painterResource(R.drawable.regular_outline_filter),
+//                contentDescription = "Filter",
+//                tint = Color.White,
+//                modifier = Modifier.size(28.dp)
+//            )
+//        }
     }
 }

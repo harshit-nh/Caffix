@@ -2,6 +2,8 @@ package com.capncook.caffix.feature.home.domain.model
 
 data class HomeConfig(
     val headerGradientColors: List<String>,
+    val searchBarBackgroundColor: String,
+    val locationTextColor: String,
     val heroBanner: HeroBanner
 )
 

@@ -35,7 +35,7 @@ import com.capncook.caffix.feature.home.domain.model.Category
 @Composable
 fun HomeScreenCategories(
     categories: List<Category>,
-    selectedCategoryId: String?,
+    selectedCategorySlug: String?,
     onCategoryClick: (String) -> Unit
 ) {
 
@@ -45,7 +45,7 @@ fun HomeScreenCategories(
     ) {
         items(categories) { category ->
 
-            val isSelected = category.id == selectedCategoryId
+            val isSelected = category.slug == selectedCategorySlug
 
             Box(
                 modifier = Modifier
@@ -56,7 +56,7 @@ fun HomeScreenCategories(
                     )
                     .clip(CircleShape)
                     .clickable {
-                        onCategoryClick(category.id)
+                        onCategoryClick(category.slug)
                     }
                     .background(
                         color = if (isSelected) LightBrown

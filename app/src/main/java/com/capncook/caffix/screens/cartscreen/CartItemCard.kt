@@ -56,12 +56,12 @@ fun CartItemCard(
             verticalAlignment = Alignment.CenterVertically
         )
         {
-            Image(painter = painterResource(product.imageRes),
-                contentDescription = "Coffee Image",
-                modifier = Modifier
-                    .size(70.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
+//            Image(painter = painterResource(product.imageRes),
+//                contentDescription = "Coffee Image",
+//                modifier = Modifier
+//                    .size(70.dp)
+//                    .clip(RoundedCornerShape(10.dp))
+//            )
 
             Column(modifier = Modifier
                 .weight(1f)
@@ -74,12 +74,12 @@ fun CartItemCard(
                     color = Color.Black
                 )
 
-                Text(text = product.description,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                    color = Color.DarkGray
-                )
+//                Text(text = product.description,
+//                    fontFamily = poppinsFontFamily,
+//                    fontWeight = FontWeight.Normal,
+//                    fontSize = 16.sp,
+//                    color = Color.DarkGray
+//                )
             }
             
             Column(verticalArrangement = Arrangement.Center,
@@ -130,12 +130,12 @@ fun CartItemCard(
 
                 Spacer(modifier = Modifier.height(15.dp))
                 
-                Text(text = "₹${(quantity * product.price).toInt()}",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp,
-                    color = LightBrown
-                )
+//                Text(text = "₹${(quantity * product.price).toInt()}",
+//                    fontFamily = poppinsFontFamily,
+//                    fontWeight = FontWeight.SemiBold,
+//                    fontSize = 18.sp,
+//                    color = LightBrown
+//                )
             }
         }
     }

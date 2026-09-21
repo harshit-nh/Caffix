@@ -30,65 +30,65 @@ import com.capncook.caffix.ui_components.AppMessageDialog
 @Composable
 fun DetailsScreenBottomBar(product: Product) {
 
-    var showCartDialog by remember { mutableStateOf(false) }
-
-    BottomAppBar(
-        containerColor = Color.White,
-        modifier = Modifier.padding(bottom = 10.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp)
-        ) {
-            Column() {
-                Text(
-                    text = "Price",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 18.sp,
-                    color = Color.DarkGray
-                )
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Text(
-                    text = "₹${product.price}",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp,
-                    color = LightBrown
-                )
-            }
-
-            Spacer(modifier = Modifier.width(45.dp))
-
-            Button(
-                modifier = Modifier.weight(1f)
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = LightBrown,
-                    contentColor = IvoryWhite
-                ),
-                onClick = {
-                    showCartDialog = true
-                }
-            ) {
-
-                Text(
-                    text = "Add to Cart",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 20.sp
-                )
-            }
-
-            AppMessageDialog(
-                show = showCartDialog,
-                title = "Added to Cart",
-                message = "Your item has been added to your cart.",
-                onDismiss = { showCartDialog = false }
-            )
-        }
-    }
+//    var showCartDialog by remember { mutableStateOf(false) }
+//
+//    BottomAppBar(
+//        containerColor = Color.White,
+//        modifier = Modifier.padding(bottom = 10.dp)
+//    ) {
+//        Row(
+//            modifier = Modifier.padding(horizontal = 12.dp)
+//        ) {
+//            Column() {
+//                Text(
+//                    text = "Price",
+//                    fontFamily = poppinsFontFamily,
+//                    fontWeight = FontWeight.Medium,
+//                    fontSize = 18.sp,
+//                    color = Color.DarkGray
+//                )
+//
+//                Spacer(modifier = Modifier.height(5.dp))
+//
+//                Text(
+//                    text = "₹${product.price}",
+//                    fontFamily = poppinsFontFamily,
+//                    fontWeight = FontWeight.SemiBold,
+//                    fontSize = 18.sp,
+//                    color = LightBrown
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.width(45.dp))
+//
+//            Button(
+//                modifier = Modifier.weight(1f)
+//                    .height(56.dp),
+//                shape = RoundedCornerShape(12.dp),
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = LightBrown,
+//                    contentColor = IvoryWhite
+//                ),
+//                onClick = {
+//                    showCartDialog = true
+//                }
+//            ) {
+//
+//                Text(
+//                    text = "Add to Cart",
+//                    fontFamily = poppinsFontFamily,
+//                    fontWeight = FontWeight.Medium,
+//                    fontSize = 20.sp
+//                )
+//            }
+//
+//            AppMessageDialog(
+//                show = showCartDialog,
+//                title = "Added to Cart",
+//                message = "Your item has been added to your cart.",
+//                onDismiss = { showCartDialog = false }
+//            )
+//        }
+//    }
 
 }

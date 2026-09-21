@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -42,18 +43,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.capncook.caffix.R
+import com.capncook.caffix.common.Constants
 import com.capncook.caffix.common.ui_components.theme.poppinsFontFamily
 import com.capncook.caffix.feature.home.domain.model.Product
 
 @Composable
 fun ProductCardNew(
     product: Product,
-    onProductClick: (Int) -> Unit,
+    onProductClick: (String) -> Unit,
     isFavorite: Boolean,
     modifier: Modifier = Modifier
 ) {
 
+    val imageUrl = "${Constants.BASE_URL}${product.imageUrl}"
 
     Card(
         modifier = modifier
@@ -88,13 +93,19 @@ fun ProductCardNew(
                     .aspectRatio(0.90f)
             ) {
 
-                Image(
-                    painter = painterResource(product.imageRes),
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl)
+                        .crossfade(true)
+                        .memoryCacheKey(imageUrl)
+                        .diskCacheKey(imageUrl)
+                        .build(),
                     contentDescription = product.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .scale(1.5f),
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.ic_placeholder_loading)
                 )
 
                 Icon(
@@ -141,7 +152,7 @@ fun ProductCardNew(
             ) {
 
                 Text(
-                    text = "₹${product.price}",
+                    text = "₹${product.basePrice}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 17.sp,
@@ -164,7 +175,7 @@ fun ProductCardNew(
                     )
 
                     Text(
-                        text = "4.5",
+                        text = "${product.rating}",
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Medium,
                         fontSize = 13.sp,
@@ -172,12 +183,7 @@ fun ProductCardNew(
                     )
                 }
             }
-
-
         }
-
-
-
     }
 
 

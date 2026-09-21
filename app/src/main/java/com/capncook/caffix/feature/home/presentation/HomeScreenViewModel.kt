@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.capncook.caffix.R
 import com.capncook.caffix.common.Resource
 import com.capncook.caffix.common.datastore.SessionManager
+import com.capncook.caffix.common.network.domain.ConnectivityObserver
+import com.capncook.caffix.common.network.domain.GlobalRefreshManager
+import com.capncook.caffix.feature.home.domain.location.LocationTracker
 import com.capncook.caffix.feature.home.domain.model.Category
 import com.capncook.caffix.feature.home.domain.model.HomeSection
 import com.capncook.caffix.feature.home.domain.model.Product
@@ -15,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,18 +28,52 @@ import kotlin.time.Duration.Companion.milliseconds
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val repository: HomeRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val locationTracker: LocationTracker,
+    private val globalRefreshManager: GlobalRefreshManager,
+    private val connectivityObserver: ConnectivityObserver
 ): ViewModel() {
 
 
     private val _state = MutableStateFlow(HomeScreenState(
-        headerGradientColors = sessionManager.getThemeColors() ?: listOf("#303030", "#1F1F1F", "#121212")
+        headerGradientColors = sessionManager.getThemeColors() ?: listOf("#303030", "#1F1F1F", "#121212"),
+        searchBarColor = sessionManager.getSearchBarColor() ?: "#2C2C2C",
+        locationTextColor = sessionManager.getLocationTextColor() ?: "#FFFFFF"
     ))
+
     val state: StateFlow<HomeScreenState> = _state.asStateFlow()
 
 
     init {
         loadInitialData()
+        setUpRecoveryListeners()
+    }
+
+
+    private fun setUpRecoveryListeners() {
+
+        //Manual try again button
+        viewModelScope.launch {
+            globalRefreshManager.refreshEvent.collect {
+                if(!_state.value.isLoading) {
+                    loadInitialData()
+                }
+            }
+        }
+
+
+        viewModelScope.launch {
+            connectivityObserver.observe().collectLatest { status ->
+
+                if(status == ConnectivityObserver.Status.Available) {
+
+                    val needsRecovery = _state.value.error != null || _state.value.feedSections.isEmpty()
+                    if(needsRecovery && !_state.value.isLoading) {
+                        loadInitialData()
+                    }
+                }
+            }
+        }
     }
 
 
@@ -44,8 +82,12 @@ class HomeScreenViewModel @Inject constructor(
 
         when(event) {
 
+            is HomeScreenEvent.OnFetchLocation -> {
+                fetchUserLocation()
+            }
+
             is HomeScreenEvent.OnCategorySelected -> {
-                selectCategory(event.categoryId)
+                selectCategory(event.categorySlugName)
             }
 
             is HomeScreenEvent.OnProductClicked -> {
@@ -63,6 +105,27 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
+    private fun fetchUserLocation() {
+
+        viewModelScope.launch {
+
+            _state.update { it.copy(location = "Locating...") }
+
+            when(val result = locationTracker.getCurrentAddress()) {
+
+                is Resource.Success -> {
+                    _state.update { it.copy(location = result.data ?: "Select Delivery location") }
+                }
+
+                is Resource.Error -> {
+                    _state.update { it.copy(location = result.message ?: "Select Delivery Location") }
+                }
+
+                is Resource.Loading -> Unit
+            }
+        }
+    }
+
 
 
     private fun loadInitialData() {
@@ -73,47 +136,28 @@ class HomeScreenViewModel @Inject constructor(
 
             val configDeferred = async { repository.getHomeConfig() }
             val categoriesDeferred = async { repository.getCategories() }
+            val feedDeferred = async { repository.getHomeFeed(categorySlug = null) }
 
             val configResult = configDeferred.await()
             val categoryResult = categoriesDeferred.await()
-
-
-            //Fetch dummy products and sections as of now
-            val dummyProducts = listOf(
-                Product(1, "Espresso", "Strong and Rich", 120.00, R.drawable.espresso),
-                Product(2, "Latte", "Smooth and Creamy", 160.00, R.drawable.caramel_latte),
-                Product(3, "Cappuccino", "With chocolate", 128.00, R.drawable.cappuccino),
-                Product(4, "Mocha", "With cocoa flavor", 140.00, R.drawable.mocha),
-                Product(5, "Macchiato", "Bold and milky", 150.00, R.drawable.macchiato_lespresso),
-                Product(6, "Flat White", "Velvety smooth", 110.00, R.drawable.iced_flat_white),
-                Product(7, "Iced Mocha", "Refreshing and rich", 220.00, R.drawable.iced_mocha)
-            )
-
-
-            val icedDummyProducts = listOf(
-                Product(1,"Iced Mocha", "Refreshing Mocha", 222.00, R.drawable.iced_mocha),
-                Product(2, "Iced Latte", "Cold Italian Latte", 180.00, R.drawable.iced_latte),
-                Product(3,"Iced Cappuccino","Creamy Iced Cappuccino",340.00, R.drawable.iced_cappuccino),
-                Product(4, "Iced Flat White", "ICE", 230.00, R.drawable.iced_flat_white),
-                Product(5, "Iced Caramel Macchiato", "Iced Macchiato", 340.00, R.drawable.iced_caramel_macchiato)
-            )
-
-            val dummySections = listOf(
-                HomeSection.PromoBanner(imageRes = R.drawable.banner_1),
-                HomeSection.CoffeeCarousel("Popular Brews", dummyProducts),
-                HomeSection.CoffeeCarousel("Recently Ordered", dummyProducts.reversed()),
-                HomeSection.CoffeeCarousel("Famous Iced Brews", icedDummyProducts)
-            )
+            val feedResult = feedDeferred.await()
 
 
             if(configResult is Resource.Success) {
 
                 configResult.data?.let { config ->
 
-                    sessionManager.saveThemeColors(config.headerGradientColors)
+                    sessionManager.saveThemeColors(
+                        colors = config.headerGradientColors,
+                        searchBarColor = config.searchBarBackgroundColor,
+                        locationTextColor = config.locationTextColor
+                    )
+
                     _state.update { state ->
                         state.copy(
                             headerGradientColors = config.headerGradientColors,
+                            searchBarColor = config.searchBarBackgroundColor,
+                            locationTextColor = config.locationTextColor,
                             heroBanner = config.heroBanner
                         )
                     }
@@ -128,10 +172,8 @@ class HomeScreenViewModel @Inject constructor(
                 val categories = categoryResult.data ?: emptyList()
                 _state.update { state ->
                     state.copy(
-                        location = "83, Bara Bazaar, Bareilly, Opposite to Reena Model Public School, 243003, U.P",
                         categories = categories,
-                        selectedCategoryId = categories.firstOrNull()?.id,
-                        feedSections = dummySections
+                        selectedCategorySlug = categories.firstOrNull()?.slug
                     )
                 }
 
@@ -139,49 +181,55 @@ class HomeScreenViewModel @Inject constructor(
                 _state.update { it.copy(error = categoryResult.message) }
             }
 
-            _state.update { it.copy(isLoading = false) }
+
+            if(feedResult is Resource.Success) {
+
+                _state.update { state ->
+                    state.copy(feedSections = feedResult.data ?: emptyList())
+                }
+
+            }else if(feedResult is Resource.Error){
+                _state.update { it.copy(error = feedResult.message) }
+            }
+
+            _state.update { it.copy(isLoading = false, isRefreshing = false) }
 
         }
     }
 
 
-    private fun selectCategory(categoryId: String?) {
+    private fun selectCategory(categorySlugName: String?) {
+
+        if(_state.value.selectedCategorySlug == categorySlugName) return
 
         viewModelScope.launch {
 
             _state.update{
-                it.copy(selectedCategoryId = categoryId, isLoading = true)
+                it.copy(selectedCategorySlug = categorySlugName, isLoading = true)
             }
 
-            delay(1500.milliseconds)
 
-            // Here you would normally fetch filtered products based on categoryId
-            val dummyProducts = listOf(
-                Product(1, "Caramel Macchiato", "Category specific blend", 130.00, R.drawable.caramel_macchiato),
-                Product(4, "Mocha", "With cocoa flavor", 140.00, R.drawable.mocha),
-                Product(5, "Macchiato", "Bold and milky", 150.00, R.drawable.macchiato_lespresso),
-                Product(6, "Flat White", "Velvety smooth", 110.00, R.drawable.iced_flat_white),
-                Product(7, "Iced Mocha", "Refreshing and rich", 220.00, R.drawable.iced_mocha)
-            )
+            when(val feedResult = repository.getHomeFeed(categorySlugName)) {
 
-            val icedDummyProducts = listOf(
-                Product(1,"Iced Mocha", "Refreshing Mocha", 222.00, R.drawable.iced_mocha),
-                Product(2, "Iced Latte", "Cold Italian Latte", 180.00, R.drawable.iced_latte),
-                Product(3,"Iced Cappuccino","Creamy Iced Cappuccino",340.00, R.drawable.iced_cappuccino),
-                Product(4, "Iced Flat White", "ICE", 230.00, R.drawable.iced_flat_white),
-                Product(5, "Iced Caramel Macchiato", "Iced Macchiato", 340.00, R.drawable.iced_caramel_macchiato)
-            )
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            feedSections = feedResult.data ?: emptyList()
+                        )
+                    }
+                }
 
-            val filteredSections = listOf(
-                HomeSection.CoffeeCarousel(title = "Popular Hot Brews", products = dummyProducts),
-                HomeSection.CoffeeCarousel(title = "Iced Brews Options", products = icedDummyProducts)
-            )
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = feedResult.message
+                        )
+                    }
+                }
 
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    feedSections = filteredSections
-                )
+                is Resource.Loading -> Unit
             }
 
         }
@@ -191,14 +239,8 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun refreshHomeData() {
 
-        viewModelScope.launch {
-            _state.update{ it.copy(isRefreshing = true) }
-
-            delay(1500.milliseconds)
-
-            _state.update{ it.copy(isRefreshing = false) }
-
-        }
+        _state.update { it.copy(isRefreshing = true) }
+        loadInitialData()
     }
 
 

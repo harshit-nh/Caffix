@@ -40,119 +40,119 @@ import com.capncook.caffix.common.ui_components.theme.poppinsFontFamily
 @Composable
 fun FavouriteItemCard(product: Product, onRemoveClick: () -> Unit) {
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 25.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = LightGray
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
-    ) {
-
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            )
-            {
-                Image(painter = painterResource(product.imageRes),
-                    contentDescription = "Coffee Image",
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                )
-
-                Column(modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp)) {
-
-                    Text(text = product.name,
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp,
-                        color = Color.Black
-                    )
-
-                    Text(text = product.description,
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp,
-                        color = Color.DarkGray
-                    )
-                }
-
-
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-
-                    IconButton(
-                        onClick = {
-                            onRemoveClick()
-                        },
-                        modifier = Modifier
-                            .background(
-                                color = LightBrown.copy(alpha = 0.1f),
-                                shape = CircleShape
-                            )
-                            .size(38.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Remove",
-                            tint = Color.Red.copy(alpha = 0.7f)
-                        )
-                    }
-
-                }
-
-            }
-
-
-            Box(
-                modifier = Modifier
-                    .height(35.dp)
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0x0D303030),
-                                Color(0x0D1F1F1F)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ){
-
-                TextButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .height(35.dp)
-                    )
-                {
-                    
-                    Text(text = "Add to Cart",
-                        modifier = Modifier.fillMaxHeight(),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
-                        color = LightBrown
-                    )
-
-                }
-            }
-
-        }
-
-
-    }
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(bottom = 25.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = LightGray
+//        ),
+//        elevation = CardDefaults.cardElevation(
+//            defaultElevation = 4.dp
+//        )
+//    ) {
+//
+//        Column(modifier = Modifier.fillMaxWidth(),
+//            horizontalAlignment = Alignment.CenterHorizontally) {
+//
+//
+//            Row(modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(12.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            )
+//            {
+//                Image(painter = painterResource(product.imageRes),
+//                    contentDescription = "Coffee Image",
+//                    modifier = Modifier
+//                        .size(70.dp)
+//                        .clip(RoundedCornerShape(10.dp))
+//                )
+//
+//                Column(modifier = Modifier
+//                    .weight(1f)
+//                    .padding(start = 10.dp)) {
+//
+//                    Text(text = product.name,
+//                        fontFamily = poppinsFontFamily,
+//                        fontWeight = FontWeight.SemiBold,
+//                        fontSize = 20.sp,
+//                        color = Color.Black
+//                    )
+//
+//                    Text(text = product.description,
+//                        fontFamily = poppinsFontFamily,
+//                        fontWeight = FontWeight.Normal,
+//                        fontSize = 16.sp,
+//                        color = Color.DarkGray
+//                    )
+//                }
+//
+//
+//                Row(horizontalArrangement = Arrangement.spacedBy(10.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ){
+//
+//                    IconButton(
+//                        onClick = {
+//                            onRemoveClick()
+//                        },
+//                        modifier = Modifier
+//                            .background(
+//                                color = LightBrown.copy(alpha = 0.1f),
+//                                shape = CircleShape
+//                            )
+//                            .size(38.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Delete,
+//                            contentDescription = "Remove",
+//                            tint = Color.Red.copy(alpha = 0.7f)
+//                        )
+//                    }
+//
+//                }
+//
+//            }
+//
+//
+//            Box(
+//                modifier = Modifier
+//                    .height(35.dp)
+//                    .fillMaxWidth()
+//                    .background(
+//                        brush = Brush.linearGradient(
+//                            colors = listOf(
+//                                Color(0x0D303030),
+//                                Color(0x0D1F1F1F)
+//                            )
+//                        )
+//                    ),
+//                contentAlignment = Alignment.Center
+//            ){
+//
+//                TextButton(
+//                    onClick = { },
+//                    modifier = Modifier
+//                        .padding(horizontal = 10.dp)
+//                        .height(35.dp)
+//                    )
+//                {
+//
+//                    Text(text = "Add to Cart",
+//                        modifier = Modifier.fillMaxHeight(),
+//                        fontFamily = poppinsFontFamily,
+//                        fontWeight = FontWeight.SemiBold,
+//                        fontSize = 16.sp,
+//                        color = LightBrown
+//                    )
+//
+//                }
+//            }
+//
+//        }
+//
+//
+//    }
 
 }

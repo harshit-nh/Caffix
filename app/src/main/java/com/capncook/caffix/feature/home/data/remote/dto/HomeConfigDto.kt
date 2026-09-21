@@ -3,6 +3,7 @@ package com.capncook.caffix.feature.home.data.remote.dto
 import com.capncook.caffix.feature.home.domain.model.HeroBanner
 import com.capncook.caffix.feature.home.domain.model.HomeConfig
 
+
 data class HomeConfigDto(
     val theme: ThemeDto,
     val heroBanner: HeroBannerDto
@@ -29,6 +30,8 @@ fun HomeConfigDto.toDomain(): HomeConfig {
 
     return HomeConfig(
         headerGradientColors = theme.headerGradientColors,
+        searchBarBackgroundColor = theme.searchBarBackgroundColor,
+        locationTextColor = theme.locationTextColor,
         heroBanner = HeroBanner(
             badge = heroBanner.badge,
             title = heroBanner.title,

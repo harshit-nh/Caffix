@@ -8,9 +8,10 @@ interface SessionManager {
     fun isOnboardingComplete(): Boolean
     fun clearSession()
 
-
-    fun saveThemeColors(colors: List<String>)
+    fun saveThemeColors(colors: List<String>, searchBarColor: String, locationTextColor: String)
     fun getThemeColors(): List<String>?
+    fun getSearchBarColor(): String?
+    fun getLocationTextColor(): String?
 }
 
 

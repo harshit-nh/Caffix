@@ -2,7 +2,8 @@ package com.capncook.caffix.feature.home.presentation
 
 sealed class HomeScreenEvent {
 
-    data class OnProductClicked(val productId: Int): HomeScreenEvent()
+    object OnFetchLocation: HomeScreenEvent()
+    data class OnProductClicked(val productId: String): HomeScreenEvent()
 
     object OnSearchClicked: HomeScreenEvent()
 
@@ -10,7 +11,7 @@ sealed class HomeScreenEvent {
 
     object OnLocationClicked: HomeScreenEvent()
 
-    data class OnCategorySelected(val categoryId: String?): HomeScreenEvent()
+    data class OnCategorySelected(val categorySlugName: String?): HomeScreenEvent()
 
     object OnRefresh: HomeScreenEvent()
 

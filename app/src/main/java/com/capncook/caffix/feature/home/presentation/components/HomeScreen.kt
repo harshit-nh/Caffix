@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -71,10 +72,15 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel(),
-    onProductClick: (Int) -> Unit
+    onProductClick: (String) -> Unit
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    //Fetching the location once in this screen
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(HomeScreenEvent.OnFetchLocation)
+    }
 
     val listState = rememberLazyListState()
 
@@ -83,7 +89,7 @@ fun HomeScreen(
     }
 
 
-    val gradientColors = if(state.headerGradientColors.isNotEmpty()) {
+    val gradientColors = if (state.headerGradientColors.isNotEmpty()) {
         state.headerGradientColors.map { it.toComposeColor() }
     } else {
         listOf(Color(0xFF303030), Color(0xFF1F1F1F), Color(0xFF121212))
@@ -132,9 +138,12 @@ fun HomeScreen(
                             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp)
                     ) {
 
+                        val resolvedLocationTextColor =
+                            state.locationTextColor?.toComposeColor() ?: Color.White
+
                         Text(
-                            text = "Location",
-                            color = Color.LightGray,
+                            text = "Deliver to,",
+                            color = resolvedLocationTextColor.copy(alpha = 0.7f),
                             fontSize = 14.sp,
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Normal
@@ -144,9 +153,9 @@ fun HomeScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
 
                             Text(
-                                modifier = Modifier.fillMaxWidth(2f / 3f),
+                                modifier = Modifier.weight(1f, fill = false),
                                 text = state.location,
-                                color = Color.White,
+                                color = resolvedLocationTextColor,
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 16.sp,
@@ -154,10 +163,12 @@ fun HomeScreen(
                                 overflow = TextOverflow.Ellipsis
                             )
 
+
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowDown,
                                 contentDescription = null,
-                                tint = Color.White
+                                tint = resolvedLocationTextColor,
+                                modifier = Modifier.padding(start = 4.dp)
                             )
 
                         }
@@ -167,12 +178,13 @@ fun HomeScreen(
 
                         SearchBar(
                             modifier = Modifier.padding(horizontal = 16.dp),
+                            containerColor = state.searchBarColor,
                             isDarkTheme = true
                         )
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-                        if(state.isLoading && state.heroBanner == null) {
+                        if (state.isLoading && state.heroBanner == null) {
 
                             //Banner skeleton
                             Box(
@@ -182,7 +194,7 @@ fun HomeScreen(
                                     .shimmerEffect()
                             )
 
-                        } else{
+                        } else {
 
                             state.heroBanner?.let { banner ->
 
@@ -220,7 +232,7 @@ fun HomeScreen(
                 Column {
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if(state.isLoading && state.categories.isEmpty()) {
+                    if (state.isLoading && state.categories.isEmpty()) {
 
                         CategorySkeletonRow()
 
@@ -228,7 +240,7 @@ fun HomeScreen(
 
                         HomeScreenCategories(
                             categories = state.categories,
-                            selectedCategoryId = state.selectedCategoryId,
+                            selectedCategorySlug = state.selectedCategorySlug,
                             onCategoryClick = { id ->
                                 viewModel.onEvent(HomeScreenEvent.OnCategorySelected(id))
                             }
@@ -242,7 +254,7 @@ fun HomeScreen(
 
 
             // THE DYNAMIC FEED (Server-Driven UI Pattern)
-            if(state.isLoading) {
+            if (state.isLoading) {
 
                 repeat(3) {
                     item {
@@ -266,63 +278,136 @@ fun HomeScreen(
                         }
                     }
                 }
-            }else {
+            } else {
 
                 state.feedSections.forEach { section ->
 
                     when(section) {
 
-                        is HomeSection.CoffeeCarousel -> {
+                        is HomeSection.Carousel -> {
+
                             item {
                                 Column {
-
                                     Text(
                                         text = section.title,
-                                        fontFamily = poppinsFontFamily,
                                         fontWeight = FontWeight.SemiBold,
+                                        fontFamily = poppinsFontFamily,
                                         fontSize = 18.sp,
                                         color = Color.Black,
                                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                                     )
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    LazyRow(
-                                        contentPadding = PaddingValues(horizontal = 16.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                    ) {
-
-                                        items(section.products) { product ->
-
-                                            ProductCardNew(
-                                                modifier = Modifier.fillParentMaxWidth(
-                                                    fraction = 0.44f
-                                                ),
-                                                product = product,
-                                                onProductClick = {
-                                                    viewModel.onEvent(HomeScreenEvent.OnProductClicked(product.id))
-                                                    onProductClick(product.id)
-                                                },
-                                                isFavorite = false
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.height(32.dp))
-
                                 }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                LazyRow(
+                                    contentPadding = PaddingValues(horizontal = 16.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+
+                                    items(
+                                        items = section.items,
+                                        key = { product -> product.id}
+                                    ) { product ->
+
+                                        ProductCardNew(
+                                            modifier = Modifier.fillParentMaxWidth(0.44f),
+                                            product = product,
+                                            onProductClick = {
+                                                viewModel.onEvent(HomeScreenEvent.OnProductClicked(product.id))
+                                            },
+                                            isFavorite = false
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(32.dp))
                             }
                         }
 
-                        is HomeSection.PromoBanner -> {
 
+                        is HomeSection.TwoColumnGrid -> {
+
+                            item {
+                                Text(
+                                    text = section.title,
+                                    fontFamily = poppinsFontFamily,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            val rows = section.items.chunked(2)
+
+                            rows.forEach { rowProducts ->
+
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+
+                                        // First Product in the row
+                                        ProductCardNew(
+                                            modifier = Modifier.weight(1f),
+                                            product = rowProducts[0],
+                                            onProductClick = {
+                                                viewModel.onEvent(HomeScreenEvent.OnProductClicked(rowProducts[0].id))
+                                                onProductClick(rowProducts[0].id)
+                                            },
+                                            isFavorite = false
+                                        )
+
+                                        // Second Product in the row (if exists)
+                                        if (rowProducts.size > 1) {
+                                            ProductCardNew(
+                                                modifier = Modifier.weight(1f),
+                                                product = rowProducts[1],
+                                                onProductClick = {
+                                                    viewModel.onEvent(HomeScreenEvent.OnProductClicked(rowProducts[1].id))
+                                                    onProductClick(rowProducts[1].id)
+                                                },
+                                                isFavorite = false
+                                            )
+                                        } else {
+                                            // Empty space if the grid has an odd number of items
+                                            Spacer(modifier = Modifier.weight(1f))
+                                        }
+                                    }
+                                }
+                            }
+
+                            item {
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+
+
+                        is HomeSection.PromoCard -> {
+
+                            item {
+                                PromotionalProduct(
+                                    promo = section,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                    onClick = { productId ->
+                                        viewModel.onEvent(HomeScreenEvent.OnProductClicked(productId))
+                                        onProductClick(productId)
+                                    }
+                                )
+
+                                Spacer(modifier = Modifier.height(32.dp))
+                            }
                         }
                     }
                 }
             }
         }
-
-
 
 
         // This is hidden initially. It only animates in when the user scrolls past the banner!
@@ -335,11 +420,10 @@ fun HomeScreen(
 
             // Surface automatically adds a nice subtle drop shadow (elevation)
             Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
                 color = Color.White,
-                shadowElevation = 14.dp
+                shadowElevation = 12.dp
             ) {
 
                 Column(
@@ -357,11 +441,11 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    if(state.categories.isNotEmpty()) {
+                    if (state.categories.isNotEmpty()) {
 
                         HomeScreenCategories(
                             categories = state.categories,
-                            selectedCategoryId = state.selectedCategoryId,
+                            selectedCategorySlug = state.selectedCategorySlug,
                             onCategoryClick = {
                                 viewModel.onEvent(
                                     HomeScreenEvent.OnCategorySelected(
@@ -374,8 +458,6 @@ fun HomeScreen(
                 }
             }
         }
-
-
 
 
     }

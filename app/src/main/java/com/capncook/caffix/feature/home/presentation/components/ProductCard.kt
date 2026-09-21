@@ -72,16 +72,16 @@ fun ProductCard(
                     .height(150.dp)
             ) {
 
-                Image(
-                    painter = painterResource(product.imageRes),
-                    contentDescription = "Product Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(
-                            RoundedCornerShape(24.dp)
-                        )
-                )
+//                Image(
+//                    painter = painterResource(product.imageRes),
+//                    contentDescription = "Product Image",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .clip(
+//                            RoundedCornerShape(24.dp)
+//                        )
+//                )
 
                 Box(
                     modifier = Modifier
@@ -116,15 +116,15 @@ fun ProductCard(
             Spacer(modifier = Modifier.height(4.dp))
 
 
-            Text(
-                text = product.description,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp,
-                color = Color.Gray,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
+//            Text(
+//                text = product.description,
+//                fontFamily = poppinsFontFamily,
+//                fontWeight = FontWeight.Medium,
+//                fontSize = 12.sp,
+//                color = Color.Gray,
+//                maxLines = 3,
+//                overflow = TextOverflow.Ellipsis
+//            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -134,14 +134,14 @@ fun ProductCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Text(
-                    text = "₹${product.price}",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    color = LightBrown
-                )
+//
+//                Text(
+//                    text = "₹${product.price}",
+//                    fontFamily = poppinsFontFamily,
+//                    fontWeight = FontWeight.SemiBold,
+//                    fontSize = 14.sp,
+//                    color = LightBrown
+//                )
 
                 IconButton(
                     onClick = {
